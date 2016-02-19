@@ -9,7 +9,7 @@ description = open(join(dirname(__file__), 'README.rst')).read()
 
 setup(
     name='demultipart',
-    version='0.1',
+    version='0.2',
     author='Vincent Pelletier',
     author_email='plr.vincent@gmail.com',
     description=next(x for x in description.splitlines() if x.strip()),
