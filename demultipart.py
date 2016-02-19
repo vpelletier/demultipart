@@ -60,7 +60,9 @@ def main():
                     if e.errno != errno.EEXIST:
                         raise
             with open(full_path, 'wb') as fp:
-                fp.write(part.get_payload(decode=True))
+                payload = part.get_payload(decode=True)
+                if payload:
+                    fp.write(payload)
 
 if __name__ == '__main__':
     main()
