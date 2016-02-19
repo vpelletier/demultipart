@@ -14,9 +14,11 @@ def main():
         'extract content from')
     args = parser.parse_args()
     for msgfile in args.msgfile:
-        directory = os.path.normpath(
-            os.path.splitext(os.path.basename(msgfile))[0]
-        )
+        base_file = os.path.basename(msgfile)
+        noext_file = os.path.splitext(base_file)[0]
+        if noext_file == base_file:
+            noext_file += '-out'
+        directory = os.path.normpath(noext_file)
         if os.path.exists(directory):
             print(
                 '%s: %s exists, skipping...' % (msgfile, directory),
