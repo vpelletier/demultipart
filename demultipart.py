@@ -10,9 +10,18 @@ import sys
 
 def main():
     parser = ArgumentParser(description=__doc__)
+    parser.add_argument('-v', dest='verbose', action='store_true',
+        help='List while extracting')
+    parser.add_argument('-l', dest='list', action='store_true',
+        help='List without extracting')
     parser.add_argument('msgfile', nargs='+', help='MIME multipart/* file to '
         'extract content from')
     args = parser.parse_args()
+    if args.list:
+        args.verbose = True
+        extract = False
+    else:
+        extract = True
     for msgfile in args.msgfile:
         base_file = os.path.basename(msgfile)
         noext_file = os.path.splitext(base_file)[0]
@@ -52,17 +61,20 @@ def main():
                 )
                 continue
             counter += 1
-            dirname = os.path.dirname(full_path)
-            if dirname:
-                try:
-                    os.makedirs(dirname)
-                except OSError as e:
-                    if e.errno != errno.EEXIST:
-                        raise
-            with open(full_path, 'wb') as fp:
-                payload = part.get_payload(decode=True)
-                if payload:
-                    fp.write(payload)
+            if args.verbose:
+                print(full_path)
+            if extract:
+                dirname = os.path.dirname(full_path)
+                if dirname:
+                    try:
+                        os.makedirs(dirname)
+                    except OSError as e:
+                        if e.errno != errno.EEXIST:
+                            raise
+                with open(full_path, 'wb') as fp:
+                    payload = part.get_payload(decode=True)
+                    if payload:
+                        fp.write(payload)
 
 if __name__ == '__main__':
     main()
