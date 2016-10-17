@@ -7,6 +7,7 @@ import errno
 import mimetypes
 import os
 import sys
+import urlparse
 
 def main():
     parser = ArgumentParser(description=__doc__)
@@ -42,6 +43,20 @@ def main():
             if part.get_content_maintype() == 'multipart':
                 continue
             rel_path = part.get_filename()
+            if rel_path is None:
+                content_location = part['Content-Location']
+                if content_location:
+                    content_location = urlparse.urlparse(content_location)
+                    assert content_location.scheme == 'file'
+                    if not content_location.path and content_location.netloc:
+                        rel_path = content_location.netloc
+                    else:
+                        assert not content_location.netloc, content_location
+                        rel_path = content_location.path.lstrip('/')
+                    assert not content_location.params, content_location
+                    assert not content_location.query, content_location
+                    assert not content_location.fragment, content_location
+                    rel_path = rel_path.replace('\\', '/')
             full_path = os.path.normpath(os.path.join(
                 directory,
                 rel_path or 'part-%03d%s' % (
